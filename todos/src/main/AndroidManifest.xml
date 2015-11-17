@@ -6,7 +6,16 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme"
+        android:name="net.rajeesh.mobile.android.app.ttd.application.TtdApplication">
+
+        <meta-data
+            android:name="TODOS_DB_NAME"
+            android:value="todos.db"/>
+        <meta-data
+            android:name="TODOS_DB_VERSION"
+            android:value="1"/>
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" >

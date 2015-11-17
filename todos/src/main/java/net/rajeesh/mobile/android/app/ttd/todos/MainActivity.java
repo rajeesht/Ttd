@@ -6,12 +6,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.*;
-import org.apache.commons.io.FileUtils;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ListView;
+import com.activeandroid.ActiveAndroid;
+import com.activeandroid.query.Delete;
+import com.activeandroid.query.Select;
+import net.rajeesh.mobile.android.app.ttd.todoa.data.TodoItem;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -97,23 +102,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void readItems() {
-        File filesDir = getFilesDir();
-        File file = new File(filesDir, "todo.txt");
         try {
-            todoItems = new ArrayList<String>(FileUtils.readLines(file));
+            List<TodoItem> todoItemsFromDb = new Select().distinct().from(TodoItem.class).orderBy("todo_id").execute();
+            for (TodoItem item : todoItemsFromDb) {
+                todoItems.add(item.id, item.name);
+            }
         }
-        catch (IOException e) {
-
+        catch (NullPointerException ex) {
+            ex.printStackTrace();
         }
     }
 
     private void writeItems() {
-        File filesDir = getFilesDir();
-        File file = new File(filesDir, "todo.txt");
+        ActiveAndroid.beginTransaction();
         try {
-            FileUtils.writeLines(file, todoItems);
-        } catch (IOException e) {
-
+            new Delete().from(TodoItem.class).execute();
+            if (!todoItems.isEmpty()) {
+                for (String item : todoItems) {
+                    TodoItem todoItem = new TodoItem(todoItems.indexOf(item), item, (byte) 0);
+                    todoItem.save();
+                }
+            }
+            ActiveAndroid.setTransactionSuccessful();
+        } finally {
+            ActiveAndroid.endTransaction();
         }
     }
 }
