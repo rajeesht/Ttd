@@ -78,14 +78,15 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (data.getExtras() == null) return;
-        TodoItem item = (TodoItem) data.getSerializableExtra("listItem");
-        if (item != null) {
-            if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_NEW) {
-                todoItems.add(item);
-            } else if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_EDIT) {
-                int position = data.getIntExtra("itemPosition", 0);
-                todoItems.set(position, item);
+        if (resultCode == RESULT_OK) {
+            TodoItem item = (TodoItem) data.getSerializableExtra("listItem");
+            if (item != null) {
+                if (requestCode == REQUEST_CODE_NEW) {
+                    todoItems.add(item);
+                } else if (requestCode == REQUEST_CODE_EDIT) {
+                    int position = data.getIntExtra("itemPosition", 0);
+                    todoItems.set(position, item);
+                }
             }
             aTodoAdapter.notifyDataSetChanged();
             writeItems();
