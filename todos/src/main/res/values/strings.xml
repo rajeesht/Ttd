@@ -7,4 +7,8 @@
   <string name="add_item">Add a new item</string>
   <string name="title_activity_edit_item">EditItemActivity</string>
   <string name="save">Save</string>
+  <string name="title_activity_add_item">AddItemActivity</string>
+  <string name="high_priority">\u2B06 High</string>
+  <string name="normal_priority">\u2B0C Normal</string>
+  <string name="low_priority">\u2B07 Low</string>
 </resources>

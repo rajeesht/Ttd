@@ -12,51 +12,23 @@ import net.rajeesh.mobile.android.app.ttd.todos.data.TodoItem;
 import net.rajeesh.mobile.android.app.ttd.todos.enums.PriorityEnum;
 
 
-public class EditItemActivity extends AppCompatActivity {
+public class AddItemActivity extends AppCompatActivity {
 
     EditText edEditText;
-    int position;
-    TodoItem todoItem;
     PriorityEnum priority;
-    RadioButton rbLow;
-    RadioButton rbNormal;
-    RadioButton rbHigh;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_item);
+        setContentView(R.layout.activity_add_item);
+        priority = PriorityEnum.NORMAL;
         edEditText = (EditText) findViewById(R.id.edEditText);
-        todoItem = (TodoItem) getIntent().getSerializableExtra("listItem");
-        edEditText.setText(todoItem.name);
-        rbLow = (RadioButton) findViewById(R.id.rbLow);
-        rbNormal = (RadioButton) findViewById(R.id.rbNormal);
-        rbHigh = (RadioButton) findViewById(R.id.rbHigh);
-        switch(todoItem.priority) {
-            case -1:
-                rbLow.toggle();
-                priority = PriorityEnum.LOW;
-                break;
-            case 0:
-                rbNormal.toggle();
-                priority = PriorityEnum.NORMAL;
-                break;
-            case 1:
-                rbHigh.toggle();
-                priority = PriorityEnum.HIGH;
-                break;
-            default:
-                rbNormal.toggle();
-                priority = PriorityEnum.NORMAL;
-                break;
-        }
-        position = getIntent().getIntExtra("itemPosition", 0);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_edit_item, menu);
+        getMenuInflater().inflate(R.menu.menu_add_item, menu);
         return true;
     }
 
@@ -84,11 +56,11 @@ public class EditItemActivity extends AppCompatActivity {
             case R.id.rbHigh:
                 if (checked)
                     priority = PriorityEnum.HIGH;
-                break;
+                    break;
             case R.id.rbNormal:
                 if (checked)
                     priority = PriorityEnum.NORMAL;
-                break;
+                    break;
             case R.id.rbLow:
                 if (checked)
                     priority = PriorityEnum.LOW;
@@ -105,7 +77,6 @@ public class EditItemActivity extends AppCompatActivity {
         todoItem.name = edEditText.getText().toString();
         todoItem.priority = priority.getPriorityValue();
         data.putExtra("listItem", todoItem);
-        data.putExtra("itemPosition", position);
         setResult(RESULT_OK, data);
         this.finish();
     }

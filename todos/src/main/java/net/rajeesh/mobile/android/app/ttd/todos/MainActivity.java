@@ -8,25 +8,24 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ListView;
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
-import net.rajeesh.mobile.android.app.ttd.todoa.data.TodoItem;
+import net.rajeesh.mobile.android.app.ttd.adapter.TodoItemAdapter;
+import net.rajeesh.mobile.android.app.ttd.todos.data.TodoItem;
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    ArrayList<String> todoItems;
-    ArrayAdapter<String> aTodoAdapter;
+    ArrayList<TodoItem> todoItems;
+    ArrayAdapter<TodoItem> aTodoAdapter;
     ListView lvItems;
-    EditText edEditText;
 
-    final int REQUEST_CODE = 20;
+    final int REQUEST_CODE_NEW = 10;
+    final int REQUEST_CODE_EDIT = 20;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
         populateArrayItems();
         lvItems = (ListView) findViewById(R.id.lvItems);
         lvItems.setAdapter(aTodoAdapter);
-        edEditText = (EditText) findViewById(R.id.edEditText);
         lvItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
@@ -51,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent i = new Intent(MainActivity.this, EditItemActivity.class);
                 i.putExtra("listItem", todoItems.get(position));
                 i.putExtra("itemPosition", position);
-                startActivityForResult(i, REQUEST_CODE);
+                startActivityForResult(i, REQUEST_CODE_EDIT);
             }
         });
     }
@@ -80,35 +78,36 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
-            String item = data.getExtras().getString("listItem");
-            int position = data.getIntExtra("itemPosition", 0);
-            todoItems.set(position, item);
+        if (data.getExtras() == null) return;
+        TodoItem item = (TodoItem) data.getSerializableExtra("listItem");
+        if (item != null) {
+            if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_NEW) {
+                todoItems.add(item);
+            } else if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_EDIT) {
+                int position = data.getIntExtra("itemPosition", 0);
+                todoItems.set(position, item);
+            }
             aTodoAdapter.notifyDataSetChanged();
             writeItems();
         }
     }
 
     public void populateArrayItems() {
-        todoItems = new ArrayList<String>();
+        todoItems = new ArrayList<TodoItem>();
         readItems();
-        aTodoAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, todoItems);
+        aTodoAdapter = new TodoItemAdapter(this, todoItems);
     }
 
     public void onAddItem(View view) {
-        aTodoAdapter.add(edEditText.getText().toString());
-        edEditText.setText("");
-        writeItems();
+        Intent i = new Intent(MainActivity.this, AddItemActivity.class);
+        startActivityForResult(i, REQUEST_CODE_NEW);
     }
 
     private void readItems() {
         try {
-            List<TodoItem> todoItemsFromDb = new Select().distinct().from(TodoItem.class).orderBy("todo_id").execute();
-            for (TodoItem item : todoItemsFromDb) {
-                todoItems.add(item.id, item.name);
-            }
+            todoItems = (ArrayList) new Select().distinct().from(TodoItem.class).orderBy("todo_id").execute();
         }
-        catch (NullPointerException ex) {
+        catch (Exception ex) {
             ex.printStackTrace();
         }
     }
@@ -118,13 +117,20 @@ public class MainActivity extends AppCompatActivity {
         try {
             new Delete().from(TodoItem.class).execute();
             if (!todoItems.isEmpty()) {
-                for (String item : todoItems) {
-                    TodoItem todoItem = new TodoItem(todoItems.indexOf(item), item, (byte) 0);
-                    todoItem.save();
+                for (TodoItem todoItem : todoItems) {
+                    TodoItem newTodoItem = new TodoItem();
+                    newTodoItem.id = todoItems.indexOf(todoItem);
+                    newTodoItem.name = todoItem.name;
+                    newTodoItem.priority = todoItem.priority;
+                    newTodoItem.save();
                 }
             }
             ActiveAndroid.setTransactionSuccessful();
-        } finally {
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        finally {
             ActiveAndroid.endTransaction();
         }
     }

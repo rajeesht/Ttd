@@ -6,7 +6,7 @@
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:paddingTop="@dimen/activity_vertical_margin"
                 android:paddingBottom="@dimen/activity_vertical_margin"
-                tools:context="net.rajeesh.mobile.android.app.ttd.todos.EditItemActivity">
+                tools:context="net.rajeesh.mobile.android.app.ttd.todos.AddItemActivity">
 
   <EditText
       android:layout_width="wrap_content"
@@ -15,7 +15,7 @@
       android:layout_alignParentStart="true"
       android:layout_below="@+id/radioGroup"
       android:layout_alignParentEnd="true"
-      android:text="@string/add_item"/>
+      android:hint="@string/add_item"/>
   <RadioGroup
       android:layout_width="fill_parent"
       android:layout_height="wrap_content"
@@ -35,7 +35,7 @@
         android:layout_height="wrap_content"
         android:text="@string/normal_priority"
         android:id="@+id/rbNormal"
-        android:checked="false"
+        android:checked="true"
         android:layout_below="@+id/rbHigh"
         android:layout_alignParentStart="true"
         android:onClick="onRadioButtonClicked"/>
@@ -53,6 +53,8 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:text="@string/save"
-      android:id="@+id/btnSave" android:layout_below="@+id/edEditText" android:layout_alignEnd="@+id/edEditText"
-      android:onClick="saveItem"/>
+      android:id="@+id/btnSave"
+      android:onClick="saveItem"
+      android:layout_below="@+id/edEditText"
+      android:layout_alignParentEnd="true"/>
 </RelativeLayout>
